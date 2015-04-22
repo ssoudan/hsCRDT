@@ -20,7 +20,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:15:06
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-22 15:13:14
+-- @Last Modified time: 2015-04-22 18:17:06
 
 module IntMax
     where
@@ -37,8 +37,7 @@ instance Compare IntMax where
     is (IntMax a) (IntMax b) = a <= b
 
 instance JoinSemiLattice IntMax where
-    join (IntMax a) (IntMax b) = IntMax (max a b)
-
+    lub (IntMax a) (IntMax b) = IntMax (max a b)
 
 ----------------------------
 -- CvRDT related definitions
@@ -47,14 +46,9 @@ instance Payload IntMax where
     initial = IntMax 0
 
 instance Query IntMax () Int where
-    -- qpre = const True
-    qlet (IntMax a) _  = Just a
-
-instance Update IntMax IntMax where
-    ulet s u = Just $ join s u
-
-instance Merge IntMax where
-    merge = join
-
+    query (IntMax a) _  = Just a
+    
 instance CvRDT IntMax IntMax where
+    update s u = Just $ lub s u
+
 

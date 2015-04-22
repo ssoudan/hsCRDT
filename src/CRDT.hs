@@ -1,8 +1,10 @@
 {-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 {-
  hsCRDT.hs
 
@@ -25,21 +27,22 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 11:16:32
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-22 15:05:36
+-- @Last Modified time: 2015-04-22 18:17:23
 
 module CRDT
     where
+
+import           Data.Monoid
 
 ----------------------------
 -- Join semi-Lattice related definitions
 ----------------------------
 
-class Compare p where  -- aka Ord?
-    is :: p -> p -> Bool -- aka <=
+class Compare p where  
+    is :: p -> p -> Bool -- (is p p') is True if p <= p' 
 
 class (Compare p) => JoinSemiLattice p where
-    join :: p -> p -> p
-
+    lub :: p -> p -> p -- least-upper-bound
 
 ----------------------------
 -- CRDT related definitions - state-based specification
@@ -48,26 +51,19 @@ class Payload p where
     initial :: p
 
 class (Eq a, Payload p) => Query p q a where
-    -- qpre :: p -> Bool -- Embedded in the definition of qlet
-    qlet :: p -> q -> Maybe a
-
-class Update p u where
-    -- upre :: p -> Bool
-    ulet :: p -> u -> Maybe p
-
-class Merge p where
-    merge :: p -> p -> p -- LUB merge
-
+    query :: p -> q -> Maybe a
 
 ----------------------------
 -- CvRDT definition
 ----------------------------
-class (Payload p, {- Query p a, -} Update p u, Compare p, Merge p, JoinSemiLattice p) => CvRDT p u where
+class (Payload p, Compare p, JoinSemiLattice p) => CvRDT p u where
+        update :: p -> u -> Maybe p
+
+instance (CvRDT p u) => Monoid p where
+    mempty = initial
+    mappend = lub
 
 
-update :: forall p u. (CvRDT p u) => p -> u -> Maybe p
-update s u = ulet s u
-            
-query :: forall p q a. (Query p q a) => p -> q -> Maybe a
-query = qlet
-
+-- merge is an alias for '⊔'
+merge :: (JoinSemiLattice p) => p -> p -> p
+merge = lub
