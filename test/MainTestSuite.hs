@@ -20,7 +20,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 11:34:51
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:06:35
+-- @Last Modified time: 2015-04-24 15:00:31
 
 module Main
     where
@@ -39,7 +39,9 @@ main = defaultMain tests
 tests :: [Test]
 tests = [
           testGroup "IntMax"
-            [ testProperty "UpdatesMonotonicallyAdvance" IntMaxTest.testUpdatesMonotonicallyAdvance
+            [ testProperty "Simple" IntMaxTest.testSimple
+            , testProperty "Eq" IntMaxTest.testEq
+            , testProperty "UpdatesMonotonicallyAdvance" IntMaxTest.testUpdatesMonotonicallyAdvance
             , testProperty "testCvRDTEquivalentAbstractStates" IntMaxTest.testCvRDTEquivalentAbstractStates
             , testProperty "testMergeIdempotent" IntMaxTest.testMergeIdempotent
             , testProperty "testMergeCommutative" IntMaxTest.testMergeCommutative

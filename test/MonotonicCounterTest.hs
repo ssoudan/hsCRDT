@@ -24,7 +24,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:30:37
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:23:16
+-- @Last Modified time: 2015-04-24 14:49:51
 
 module MonotonicCounterTest
     where
@@ -54,12 +54,28 @@ instance Arbitrary CounterUpdate where
 testSimple :: Bool
 testSimple = let q1_ :: Maybe Int
                  q1_ = do
+                        -- on 0
                         let s0 :: MonotonicCounter 4
                             s0 = initial
-                        s1 <- update s0 $ Increment 2
-                        q1 <- query s1 ()
+                        s01 <- update s0 $ Increment 0    
+                        -- on 1
+                        let s1 :: MonotonicCounter 4
+                            s1 = initial
+                        s11 <- update s1 $ Increment 1
+                        let s12 = merge s01 s11
+                        -- on 2
+                        let s2 :: MonotonicCounter 4
+                            s2 = initial
+                        s21 <- update s2 $ Increment 2
+                        let s22 = merge s21 s12
+                        -- on 3
+                        let s3 :: MonotonicCounter 4
+                            s3 = initial
+                        s31 <- update s3 $ Increment 3
+                        let s32 = merge s31 s22
+                        q1 <- query s32 ()
                         return q1
-             in case q1_ of Just 1 -> True
+             in case q1_ of Just 4 -> True
                             Nothing -> False
 
 testUpdatesMonotonicallyAdvance ::(KnownNat ix) => Fin ix -> MonotonicCounter ix -> CounterUpdate -> Bool

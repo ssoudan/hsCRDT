@@ -20,7 +20,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:15:06
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-23 10:08:51
+-- @Last Modified time: 2015-04-24 14:57:51
 
 module IntMax
     where
@@ -29,9 +29,6 @@ import           CRDT
 
 
 data IntMax = IntMax Int deriving (Show, Eq)
-
-intMaxToInt :: IntMax -> Int
-intMaxToInt (IntMax i) = i
 
 intToIntMax ::  Int -> IntMax
 intToIntMax = IntMax

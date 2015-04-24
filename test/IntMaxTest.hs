@@ -20,7 +20,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:30:37
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:23:05
+-- @Last Modified time: 2015-04-24 15:00:13
 
 module IntMaxTest
     where
@@ -34,6 +34,38 @@ instance Arbitrary IntMax where
     x <- arbitrary 
     return (intToIntMax x)
   -- shrink    = (map intToIntMax) . (shrinkIntegral . intMaxToInt)
+
+testSimple :: Bool
+testSimple = let q1_ :: Maybe Int
+                 q1_ = do
+                        -- on 0
+                        let s0 :: IntMax
+                            s0 = initial
+                        s01 <- update s0 $ intToIntMax 2
+                        -- on 1
+                        let s1 :: IntMax
+                            s1 = initial
+                        s11 <- update s1 $ intToIntMax 4
+                        let s12 = merge s01 s11
+                        q1 <- query s12 ()
+                        return q1
+             in case q1_ of Just 4 -> True
+                            Nothing -> False
+testEq :: Bool
+testEq = let q1_ :: Maybe Bool
+             q1_ = do
+                        -- on 0
+                        let s0 :: IntMax
+                            s0 = initial
+                        s01 <- update s0 $ intToIntMax 2
+                        -- on 1
+                        let s1 :: IntMax
+                            s1 = initial
+                        s11 <- update s1 $ intToIntMax 2
+          
+                        return $ s11 == s01
+             in case q1_ of Just q -> q
+                            Nothing -> False
 
 testUpdatesMonotonicallyAdvance :: IntMax -> IntMax -> Bool
 testUpdatesMonotonicallyAdvance s u = let s2 = update s u
