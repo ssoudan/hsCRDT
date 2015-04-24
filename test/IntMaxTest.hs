@@ -19,13 +19,20 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:30:37
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-22 17:40:50
+-- @Last Modified time: 2015-04-24 14:04:46
 
 module IntMaxTest
     where
 
 import           CRDT
 import           IntMax
+import           Test.QuickCheck.Arbitrary
+
+instance Arbitrary IntMax where
+  arbitrary = do
+    x <- arbitrary 
+    return (intToIntMax x)
+  -- shrink    = (map intToIntMax) . (shrinkIntegral . intMaxToInt)
 
 testUpdatesMonotonicallyAdvance :: IntMax -> IntMax -> Bool
 testUpdatesMonotonicallyAdvance s u = let s2 = update s u
@@ -51,7 +58,7 @@ testMergeCommutative :: IntMax -> IntMax -> Bool
 testMergeCommutative s1 s2 = merge s1 s2 == merge s2 s1
 
 
--- TODO(ssoudan) test eventual consistency 
--- "Since merge is idempotent and commutative (by the properties of ⊔v), messages may be lost, 
---  received out of order, or multiple times, as long as new state eventually reaches all replicas, 
+-- TODO(ssoudan) test eventual consistency
+-- "Since merge is idempotent and commutative (by the properties of ⊔v), messages may be lost,
+--  received out of order, or multiple times, as long as new state eventually reaches all replicas,
 --  either directly or indirectly via successive merges."
