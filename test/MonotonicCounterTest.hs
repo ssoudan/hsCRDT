@@ -1,4 +1,8 @@
-{-# LANGUAGE DataKinds, ConstraintKinds, UndecidableInstances, RankNTypes #-}
+{-# LANGUAGE ConstraintKinds      #-}
+{-# LANGUAGE DataKinds            #-}
+{-# LANGUAGE RankNTypes           #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-
  MonotonicCounterTest.hs
 
@@ -20,7 +24,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:30:37
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:05:58
+-- @Last Modified time: 2015-04-24 14:23:16
 
 module MonotonicCounterTest
     where
@@ -35,11 +39,11 @@ import           Test.QuickCheck.Gen
 
 
 instance forall ix. (KnownNat ix) => Arbitrary (MonotonicCounter ix) where
-  arbitrary = do 
+  arbitrary = do
       xs <- arbitrary :: Gen [Int] -- TODO(ssoudan) not sure how to control the size of this list...
       x <- arbitrary :: Gen Int
       let m :: (KnownNat ix) => Vector ix Int
-          m = forAll (\n -> (cycle (x:xs)) !! (size n)) 
+          m = forAll (\n -> (cycle (x:xs)) !! (size n))
       return $ MonotonicCounter m
 
 instance Arbitrary CounterUpdate where
@@ -47,16 +51,16 @@ instance Arbitrary CounterUpdate where
     x <- arbitrary
     return (Increment x)
 
-testSimple :: Bool 
+testSimple :: Bool
 testSimple = let q1_ :: Maybe Int
-                 q1_ = do 
+                 q1_ = do
                         let s0 :: MonotonicCounter 4
                             s0 = initial
                         s1 <- update s0 $ Increment 2
                         q1 <- query s1 ()
                         return q1
              in case q1_ of Just 1 -> True
-                            Nothing -> False 
+                            Nothing -> False
 
 testUpdatesMonotonicallyAdvance ::(KnownNat ix) => Fin ix -> MonotonicCounter ix -> CounterUpdate -> Bool
 testUpdatesMonotonicallyAdvance _ s u = let s2 = update s u

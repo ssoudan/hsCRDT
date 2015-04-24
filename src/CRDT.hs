@@ -5,6 +5,7 @@
 {-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE UndecidableInstances  #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-
  hsCRDT.hs
 
@@ -27,7 +28,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 11:16:32
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-23 13:18:57
+-- @Last Modified time: 2015-04-24 14:23:22
 
 module CRDT
     where
@@ -63,7 +64,6 @@ instance (CvRDT p u) => Monoid p where
     mempty = initial
     mappend = lub
 
-
--- merge is an alias for '⊔'
+-- merge is an alias for 'lub'
 merge :: (JoinSemiLattice p) => p -> p -> p
 merge = lub

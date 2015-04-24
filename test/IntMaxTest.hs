@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-
  IntMaxTest.hs
 
@@ -19,7 +20,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 14:30:37
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:04:46
+-- @Last Modified time: 2015-04-24 14:23:05
 
 module IntMaxTest
     where

@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE KindSignatures        #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-
  MonotonicCounter.hs
 
@@ -22,7 +23,7 @@
 -- @Author: Sebastien Soudan
 -- @Date:   2015-04-22 17:43:52
 -- @Last Modified by:   Sebastien Soudan
--- @Last Modified time: 2015-04-24 14:05:05
+-- @Last Modified time: 2015-04-24 14:22:29
 
 module MonotonicCounter
     where
@@ -37,7 +38,6 @@ import           GHC.TypeLits
 data MonotonicCounter (ix :: Nat) = MonotonicCounter (Vector ix Int) deriving (Show, Eq)
 
 data CounterUpdate = Increment Int deriving (Show, Eq)
-
 
 toMonotonicCounter :: (KnownNat ix) => [Int] -> MonotonicCounter ix
 toMonotonicCounter xs = MonotonicCounter $ matrix xs
