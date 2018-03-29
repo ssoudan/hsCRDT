@@ -2,13 +2,13 @@ Require Import Coq.Unicode.Utf8.
 
 Set Implicit Arguments.
 
-  
+
 Module Type JoinSemiLattice.
   Parameter A : Type.
   Parameter le : A -> A -> Prop.
 
   Notation "x ≤ y" := (le x y) (at level 70, no associativity).
-  
+
   Axiom le_refl : forall x, x ≤ x.
   (* Axiom le_antisym : forall x y, x ≤ y -> y ≤ x -> x = y. *)
   (* Axiom le_trans : forall x y z, x ≤ y -> y ≤ z -> x ≤ z. *)
@@ -31,7 +31,7 @@ Module Type JoinSemiLattice.
     assumption.
     assumption.
   Qed.
-  
+
   Lemma lub_assoc: forall x y z, lub (lub x y) z = lub x (lub y z).
   Proof.
     intros.
@@ -41,7 +41,7 @@ Module Type JoinSemiLattice.
     elim H1.
     eexists (lub x (lub y z)).
     split.
-    apply le_refl.    
+    apply le_refl.
     split.
     assumption.
     assumption.
@@ -61,20 +61,20 @@ Module Type JoinSemiLattice.
     apply le_refl.
     apply le_refl.
   Qed.
-      
+
 End JoinSemiLattice.
 
 Module CRDT (Carrier : JoinSemiLattice).
   Definition merge a b : Carrier.A := Carrier.lub a b.
-    
+
   Parameter query : Carrier.A -> nat.
   Parameter update: nat -> Carrier.A -> Carrier.A.
   Parameter init : Carrier.A.
 
   Axiom init_low: forall a, Carrier.le init a.
-  
+
   Definition compare: Carrier.A -> Carrier.A -> Prop := Carrier.le.
-  Axiom update_monotonic: forall n s, Carrier.le s (update n s).
+  Axiom update_monotonic: forall n s, Carrier.le s (update n s). (* This is an assumption on how update operate. *)
   Definition equal (a : Carrier.A) (b : Carrier.A) : Prop := Carrier.le a b /\ Carrier.le b a.
 
   Lemma equal_refl : forall a, equal a a.
@@ -84,7 +84,7 @@ Module CRDT (Carrier : JoinSemiLattice).
     apply Carrier.le_refl.
     apply Carrier.le_refl.
   Qed.
-  
+
   Lemma merge_idemp : forall x, equal (merge x x) x.
   Proof.
     intros.
@@ -100,7 +100,7 @@ Module CRDT (Carrier : JoinSemiLattice).
     rewrite <- Carrier.lub_sym.
     apply equal_refl.
   Qed.
-    
+
   Lemma merge_assoc : forall x y z,
       equal (merge x (merge y z)) (merge (merge x y) z).
   Proof.
@@ -137,12 +137,12 @@ Module CRDT (Carrier : JoinSemiLattice).
 
     split.
     apply Carrier.le_refl.
-    
+
     apply update_monotonic.
   Qed.
 
   Lemma convergence_as_long_as_we_get_a_message: forall a s s1 s2,
-      s = merge s1 s2 -> 
+      s = merge s1 s2 ->
       update a s = merge (update a s) init /\ update a s = merge (update a s) s1 /\ update a s = merge (update a s) s2.
   Proof.
     intros.
@@ -177,7 +177,7 @@ Module CRDT (Carrier : JoinSemiLattice).
   Qed.
 
   Lemma convergence_update_and_merge_commute: forall a s s1 s2,
-      s = merge s1 s2 -> 
+      s = merge s1 s2 ->
       update a s = merge (update a s1) s.
   Proof.
     intros.
@@ -191,7 +191,7 @@ Module CRDT (Carrier : JoinSemiLattice).
     assumption.
     split.
     apply Carrier.le_refl.
-    
+
     unfold merge in H.
     pose Carrier.lub_def as H5.
     specialize (H5 s1 s2).
@@ -207,11 +207,12 @@ Module CRDT (Carrier : JoinSemiLattice).
     rewrite H.
     assumption.
   Qed.
+
+  Lemma update_mono: forall x y, compare x (update y x).
+  Proof.
+    intros.
+    unfold compare.
+    apply update_monotonic.
+  Qed.
   
 End CRDT.
-
-
-(* can't prove that. do we?
-   Lemma update_mono: forall x y, compare x (update y x).
-   Admitted.
-*)
